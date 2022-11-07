@@ -36,16 +36,20 @@ logger.addHandler(handler)
 
 
 def send_message(bot, message):
+    """Отправка сообщения в телеграм."""
     try:
         bot.send_message(TELEGRAM_CHAT_ID, text=message)
         logger.info(f'Бот отправил сообщение: {message}')
     except telegram.error.TelegramError(message):
         logger.error(
-            f'Ошибка! Бот не смог отправить сообщение'
+            'Ошибка! Бот не смог отправить сообщение'
         )
 
 
 def get_api_answer(current_timestamp):
+    """
+    Получение данных с АПИ Яндекс Практикума.
+    """
     timestamp = current_timestamp or int(time.time())
     params = {'from_date': timestamp}
 
@@ -68,6 +72,7 @@ def get_api_answer(current_timestamp):
 
 
 def check_response(response):
+    """Проверяем данные в response."""
     try:
         homeworks = response['homeworks']
     except KeyError:
@@ -81,6 +86,7 @@ def check_response(response):
 
 
 def parse_status(homework):
+    """Парсим статус."""
     status = homework.get('status')
     homework_name = homework.get('homework_name')
     if status is None:
@@ -96,6 +102,7 @@ def parse_status(homework):
 
 
 def check_tokens():
+    """Проверка токенов для работы бота."""
     error_message = (
         'Принудительная остановка',
         'Отсутствует обязательная переменная окружения'
@@ -115,7 +122,7 @@ def main():
     bot = telegram.Bot(token=TELEGRAM_TOKEN)
     send_message(
         bot,
-        f'Я начал свою работу')
+        'Я начал свою работу')
     current_timestamp = int(time.time())
     tmp_status = 'reviewing'
     errors = True
