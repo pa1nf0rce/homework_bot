@@ -51,9 +51,9 @@ def get_api_answer(current_timestamp):
     timestamp = current_timestamp or int(time.time())
     params = {'from_date': timestamp}
     requests_params = {
-    'url': ENDPOINT,
-    'headers': HEADERS,
-    'params': params
+        'url': ENDPOINT,
+        'headers': HEADERS,
+        'params': params
     }
     try:
         response = requests.get(**requests_params)
