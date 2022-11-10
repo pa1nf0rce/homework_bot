@@ -6,8 +6,8 @@ class SendMessageError(Exception):
     """Ошибка отправки сообщения."""
 
 
-class ReturnStatusIsEmpty(Exception):
-    """Пустое значение."""
+class ReturnedStatusIsEmpty(Exception):
+    """Пустое значение статуса."""
 
 
 class UnknownHomeworkStatus(Exception):
@@ -24,3 +24,6 @@ class UnexpectedError(Exception):
 
 class DecodeError(Exception):
     """Ошибка декодирования."""
+
+class ReturnedHomeWorkNameIsEmpty(Exception):
+    """Пустое значение названия домашней работы."""

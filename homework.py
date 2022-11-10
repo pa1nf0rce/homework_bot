@@ -29,7 +29,7 @@ HOMEWORK_STATUSES = {
 }
 
 logger = logging.getLogger(__name__)
-formatter = '%(asctime)s, %(levelname)s, %(message)s'
+formatter ='%(asctime)s, %(levelname)s, %(message)s'
 handler = logging.StreamHandler(sys.stdout)
 logger.setLevel(logging.DEBUG)
 handler.setFormatter(formatter)
@@ -62,13 +62,19 @@ def get_api_answer(current_timestamp):
                 f'Эндпоинт {ENDPOINT} не доступен,'
                 f'http-статус: {response.status_code}'
             )
-            logger.error(error_message)
             raise exception.HTTPStatusNotOK(error_message)
-        return response.json()
+        data_api = response.json()
     except requests.exceptions.RequestException as error_message:
-        raise exception.UnexpectedError(error_message)
+        raise exception.UnexpectedError(
+            f'Запрос c параметрами {requests_params}',
+            f'завершился ошибкой({error_message})'
+        )
     except json.JSONDecodeError as value_error:
-        raise exception.DecodeError(value_error)
+        raise exception.DecodeError(
+            'Декодирование данных JSON',
+            f'завершилось ошибкой {value_error}'
+        )
+    return data_api
 
 
 def check_response(response):
@@ -79,9 +85,15 @@ def check_response(response):
             f'ваш ответ - {type(response)}'
         )
     if 'homeworks' not in response:
-        raise KeyError('Ключ homeworks отсутствует в ответе API!')
+        raise KeyError(
+            'Ключ homeworks отсутствует в ответе API!',
+            f'пришли следующие данные {response}'
+        )
     if 'current_date' not in response:
-        raise KeyError('Отсутствует ключ current_date, в ответе API')
+        raise KeyError(
+            'Отсутствует ключ current_date, в ответе API',
+            f'пришли следующие данные {response}'
+        )
     homeworks = response['homeworks']
     if not isinstance(homeworks, list):
         raise exception.TypeNotList(
@@ -97,14 +109,19 @@ def parse_status(homework):
     homework_name = homework['homework_name']
     homework_status = homework.get('status')
     if homework_status is None:
-        raise exception.ReturnStatusIsEmpty
-    if homework_status in HOMEWORK_STATUSES:
-        verdict = HOMEWORK_STATUSES.get(homework_status)
-        return f'Изменился статус проверки работы "{homework_name}". {verdict}'
-    else:
-        raise exception.UnknownHomeworkStatus(
-            'Неизвестный статус.'
+        raise exception.ReturnedStatusIsEmpty(
+            'Пустое значение "status"'
         )
+    if homework_name is None:
+        raise exception.ReturnedHomeWorkNameIsEmpty(
+            'Пустое значение "homework_name"'
+        )
+    if homework_status not in HOMEWORK_STATUSES:
+        raise exception.UnknownHomeworkStatus(
+            f'Неизвестный статус - {homework_status}.'
+        )
+    verdict = HOMEWORK_STATUSES.get(homework_status)
+    return f'Изменился статус проверки работы "{homework_name}". {verdict}'
 
 
 def check_tokens():
@@ -129,7 +146,12 @@ def check_tokens():
 def main():
     """Основная логика работы бота."""
     if not check_tokens():
-        exit('Программа принудительно остановлена')
+        exit(
+            'Программа принудительно остановлена',
+            'в связи с отсутствием одной или',
+            'нескольких обязательных переменных окружения'
+            '("PRACTICUM_TOKEN", "TELEGRAM_TOKEN", "TELEGRAM_CHAT_ID")'
+    )
     bot = telegram.Bot(token=TELEGRAM_TOKEN)
     send_message(
         bot,
