@@ -29,7 +29,7 @@ HOMEWORK_STATUSES = {
 }
 
 logger = logging.getLogger(__name__)
-formatter ='%(asctime)s, %(levelname)s, %(message)s'
+formatter = '%(asctime)s, %(levelname)s, %(message)s'
 handler = logging.StreamHandler(sys.stdout)
 logger.setLevel(logging.DEBUG)
 handler.setFormatter(formatter)
@@ -151,7 +151,7 @@ def main():
             'в связи с отсутствием одной или',
             'нескольких обязательных переменных окружения'
             '("PRACTICUM_TOKEN", "TELEGRAM_TOKEN", "TELEGRAM_CHAT_ID")'
-    )
+        )
     bot = telegram.Bot(token=TELEGRAM_TOKEN)
     send_message(
         bot,
